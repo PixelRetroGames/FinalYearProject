@@ -293,6 +293,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
+<<<<<<< HEAD
   m_LocalRotation: {x: 0.38590598, y: 0, z: 0, w: 0.92253816}
   m_LocalPosition: {x: 0, y: 14.73, z: -13.81}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -301,6 +302,16 @@ Transform:
   m_Father: {fileID: 1531384658}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 45.4, y: 0, z: 0}
+=======
+  m_LocalRotation: {x: 0.7071068, y: 0.00006170223, z: -0.00006170223, w: 0.7071068}
+  m_LocalPosition: {x: -7.259981, y: 16.99, z: -6.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+>>>>>>> 529372f (World and simple player movement)
 --- !u!1 &1166190134
 GameObject:
   m_ObjectHideFlags: 0
@@ -397,7 +408,11 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+<<<<<<< HEAD
   m_RootOrder: 2
+=======
+  m_RootOrder: 3
+>>>>>>> 529372f (World and simple player movement)
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1531384654
 GameObject:
@@ -411,8 +426,12 @@ GameObject:
   - component: {fileID: 1531384657}
   - component: {fileID: 1531384656}
   - component: {fileID: 1531384655}
+<<<<<<< HEAD
   - component: {fileID: 1531384660}
   - component: {fileID: 1531384661}
+=======
+  - component: {fileID: 1531384659}
+>>>>>>> 529372f (World and simple player movement)
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -491,6 +510,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1531384654}
   m_LocalRotation: {x: 0, y: 0.00008726013, z: 0, w: 1}
+<<<<<<< HEAD
   m_LocalPosition: {x: 0, y: 2.26, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -500,6 +520,16 @@ Transform:
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0.01, z: 0}
 --- !u!114 &1531384660
+=======
+  m_LocalPosition: {x: -7.26, y: 2.26, z: -6.61}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0.01, z: 0}
+--- !u!114 &1531384659
+>>>>>>> 529372f (World and simple player movement)
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -511,6 +541,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4471475dd6d81f842a478d6d433de181, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+<<<<<<< HEAD
   speed: 4
 --- !u!54 &1531384661
 Rigidbody:
@@ -528,3 +559,6 @@ Rigidbody:
   m_Interpolate: 2
   m_Constraints: 0
   m_CollisionDetection: 1
+=======
+  speed: 10
+>>>>>>> 529372f (World and simple player movement)
