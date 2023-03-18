@@ -7,6 +7,8 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     public float speed;
+    private float h;
+    private float v;
 
     private Camera mainCamera;
 
@@ -19,14 +21,17 @@ public class PlayerMovement : MonoBehaviour
     {
         // Rotation
         Vector3 mousePosition = Input.mousePosition;
-        mousePosition.z = mainCamera.nearClipPlane; 
+
+        // Force ScreenToWorld to return the the y coordinate of the player
+        // instead of the distance from the camera plane
+        mousePosition.z = mainCamera.transform.position.y - transform.position.y;
+
         Vector3 mouseWorldPosition = mainCamera.ScreenToWorldPoint(mousePosition);
         transform.LookAt(mouseWorldPosition);
 
         // Translation
-        float h = Input.GetAxisRaw("Horizontal");
-        float v = Input.GetAxisRaw("Vertical");
+        h = Input.GetAxisRaw("Horizontal");
+        v = Input.GetAxisRaw("Vertical");
         transform.position += speed * new Vector3(h, 0, v) * Time.deltaTime;
-        mainCamera.transform.position = new Vector3(transform.position.x, mainCamera.transform.position.y, transform.position.z);
     }
 }
