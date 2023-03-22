@@ -32,6 +32,10 @@ public class PlayerMovement : MonoBehaviour
         // Translation
         h = Input.GetAxisRaw("Horizontal");
         v = Input.GetAxisRaw("Vertical");
-        transform.position += speed * new Vector3(h, 0, v) * Time.deltaTime;
+
+        // Normalized movement vector
+        Vector3 movement = new Vector3(h, 0, v).normalized;
+
+        transform.position += movement * speed * Time.deltaTime;
     }
 }
