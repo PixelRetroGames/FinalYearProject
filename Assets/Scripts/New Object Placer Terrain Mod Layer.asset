@@ -13,12 +13,33 @@ MonoBehaviour:
   m_Name: New Object Placer Terrain Mod Layer
   m_EditorClassIdentifier: 
   Tool: {fileID: 0}
-  noSpawnChance: 0.9
+  disabled: 0
   layers:
   - objects:
     - {fileID: 5535305502957207737, guid: 606d1d185f7ea5542bbabb8196eb3e38, type: 3}
     - {fileID: 4942515862347566044, guid: 9796b405d08286949b9943d275371988, type: 3}
     - {fileID: 3794477311923279640, guid: d9211ba8d59d43b4f9b31f5d832549a9, type: 3}
-    minDistance: 5
+    minDistance: 2
     splatMapLayer: 0
     indexes: 000000000100000002000000
+    disabled: 0
+    noSpawnChance: 0.9
+    threshold: 0.2
+    objectPlacer:
+      minScaleHorizontal: 0.5
+      maxScaleHorizontal: 1
+      minScaleVertical: 0.5
+      maxScaleVertical: 1
+  - objects:
+    - {fileID: 1030678204986712962, guid: 398b156fac7c6f44db09e9ad046c24dd, type: 3}
+    minDistance: 1
+    splatMapLayer: 4
+    indexes: 03000000
+    disabled: 0
+    noSpawnChance: 0.1
+    threshold: 0.01
+    objectPlacer:
+      minScaleHorizontal: 0.2
+      maxScaleHorizontal: 0.5
+      minScaleVertical: 0.2
+      maxScaleVertical: 0.5

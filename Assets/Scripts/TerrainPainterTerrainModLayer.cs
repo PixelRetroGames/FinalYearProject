@@ -97,6 +97,6 @@ public class TerrainPainterTerrainModLayer : TerrainModLayer
             Rebuild();
         }
         Tool._TerrainData.SetAlphamaps(0, 0, splatMap);
-        Tool._Terrain.basemapDistance = 2000;
+        // Tool._Terrain.basemapDistance = 2000;
     }
 }

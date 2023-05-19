@@ -11,8 +11,7 @@ public class ObjectPlacerTerrainModLayer : TerrainModLayer
 {
     public float[,,] splatMap = null;
 
-    [Range(0.0f, 1.0f)]
-    public float noSpawnChance;
+    public bool disabled;
 
     [System.Serializable]
     public class TerrainLayerObjectsProps
@@ -20,7 +19,16 @@ public class ObjectPlacerTerrainModLayer : TerrainModLayer
         public GameObject[] objects;
         public int minDistance;
         public int splatMapLayer;
+        [HideInInspector]
         public int[] indexes;
+        public bool disabled;
+        [Range(0.0f, 1.0f)]
+        public float noSpawnChance;
+
+        [Range(0.0f, 1.0f)]
+        public float threshold;
+
+        public TerrainObjectPlacer objectPlacer;
     }
 
     public TerrainLayerObjectsProps[] layers;
@@ -55,8 +63,12 @@ public class ObjectPlacerTerrainModLayer : TerrainModLayer
     public override void Rebuild()
     {
         SetLayers();
-        //Tool._TerrainData.treeInstances = new TreeInstance[0];
         Tool._TerrainData.SetTreeInstances(new TreeInstance[0], true);
+
+        if (disabled)
+        {
+            return;
+        }
 
         var width = Tool._TerrainData.alphamapWidth;
         var height = Tool._TerrainData.alphamapHeight;
@@ -64,14 +76,21 @@ public class ObjectPlacerTerrainModLayer : TerrainModLayer
 
         for (int layer = 0; layer < layers.Length; layer++)
         {
+            if (layers[layer].disabled)
+            {
+                continue;
+            }
             bool[,] placed = new bool[width, height];
+            int splatMapLayer = layers[layer].splatMapLayer;
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
                 {
                     float p = UnityEngine.Random.Range(0.0f, 1.0f);
-                    int splatMapLayer = layers[layer].splatMapLayer;
-                    if (p > splatMap[x, y, splatMapLayer] || splatMap[x, y, splatMapLayer] < 0.5 || p < noSpawnChance)
+
+                    if (/*p > splatMap[x, y, splatMapLayer] || */
+                        splatMap[x, y, splatMapLayer] < layers[layer].threshold ||
+                        p < layers[layer].noSpawnChance)
                     {
                         continue;
                     }
@@ -140,8 +159,11 @@ public class ObjectPlacerTerrainModLayer : TerrainModLayer
         treeTemp.position = new Vector3(x / width, 0, y / height);
 
         treeTemp.prototypeIndex = layers[layer].indexes[UnityEngine.Random.Range(0, layers[layer].indexes.Length)];
-        treeTemp.widthScale = 1f;
-        treeTemp.heightScale = 1f;
+        unsafe
+        {
+            layers[layer].objectPlacer.SetPlacement(&treeTemp);
+        }
+
         //treeTemp.color = Color.white;
         //treeTemp.lightmapColor = Color.white;
         Tool._Terrain.AddTreeInstance(treeTemp);
