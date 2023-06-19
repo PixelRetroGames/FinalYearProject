@@ -31,15 +31,29 @@ MonoBehaviour:
       minScaleVertical: 0.5
       maxScaleVertical: 1
   - objects:
-    - {fileID: 1030678204986712962, guid: 398b156fac7c6f44db09e9ad046c24dd, type: 3}
+    - {fileID: 7946188353572226548, guid: 0beaefd21e704754792e27ff74920d16, type: 3}
     minDistance: 1
     splatMapLayer: 4
     indexes: 03000000
     disabled: 0
-    noSpawnChance: 0.1
-    threshold: 0.01
+    noSpawnChance: 0.944
+    threshold: 0.202
     objectPlacer:
       minScaleHorizontal: 0.2
       maxScaleHorizontal: 0.5
       minScaleVertical: 0.2
       maxScaleVertical: 0.5
+  - objects:
+    - {fileID: 6179546325909802286, guid: d300c554f4589a640a733a84d30422d4, type: 3}
+    - {fileID: 1030678204986712962, guid: 398b156fac7c6f44db09e9ad046c24dd, type: 3}
+    minDistance: 1
+    splatMapLayer: 5
+    indexes: 0400000005000000
+    disabled: 0
+    noSpawnChance: 0.3
+    threshold: 0
+    objectPlacer:
+      minScaleHorizontal: 0.2
+      maxScaleHorizontal: 1
+      minScaleVertical: 0.2
+      maxScaleVertical: 1

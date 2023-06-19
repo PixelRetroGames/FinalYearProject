@@ -86,7 +86,7 @@ public class ObjectPlacerTerrainModLayer : TerrainModLayer
             {
                 for (int y = 0; y < height; y++)
                 {
-                    float p = UnityEngine.Random.Range(0.0f, 1.0f);
+                    float p = UnityEngine.Random.Range(0.0f, 1.0f) * (splatMap[x, y, splatMapLayer]);
 
                     if (/*p > splatMap[x, y, splatMapLayer] || */
                         splatMap[x, y, splatMapLayer] < layers[layer].threshold ||
