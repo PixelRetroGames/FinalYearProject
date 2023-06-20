@@ -1,11 +1,5 @@
 using UnityEngine;
 
-// SEE  for an explanation of forcegraph's initial implimentation
-// SEE https://youtu.be/6NT-OoEdWQE for an explanation 3ply perlin slopes.
-// SEE https://youtu.be/Vif8cdd-GVE for an explanation of 1 perlin slope combo.
-// SEE https://youtu.be/iRgh1EUxs6Y for an explanation of island borders.
-
-
 [ExecuteAlways]
 public class TerrainTool : MonoBehaviour
 {
@@ -29,12 +23,10 @@ public class TerrainTool : MonoBehaviour
     {
         public TerrainModLayer Layer;
         public bool Rebuild = false;
-        public bool Apply = false;
     }
 
     public LayerFields[] Layers;
     public bool RebuildAll = false;
-    public bool ApplyAll = false;
 
     [HideInInspector]
     public int HeightRes;
@@ -74,19 +66,34 @@ public class TerrainTool : MonoBehaviour
 
         if (Layers != null)
         {
+            if (RebuildAll)
+            {
+                bool reset = false;
+                foreach (var layer in Layers)
+                {
+                    if (layer.Layer.GetType() == typeof(ObjectPlacerTerrainModLayer))
+                    {
+                        if (!reset)
+                        {
+                            ((ObjectPlacerTerrainModLayer)layer.Layer).ResetLayers();
+                            reset = true;
+                        }
+                        ((ObjectPlacerTerrainModLayer)layer.Layer).AddPrototypes();
+                    }
+                }
+            }
+
             foreach (var layer in Layers)
             {
                 layer.Layer.Tool = this;
                 if (layer.Rebuild || RebuildAll)
                 {
                     layer.Layer.Rebuild();
-                }
-
-                if (layer.Apply || ApplyAll)
-                {
                     layer.Layer.Apply();
+                    layer.Rebuild = false;
                 }
             }
+            RebuildAll= false;
         }
 
         _TerrainData.SetHeights(0, 0, _Mesh);

@@ -9,6 +9,10 @@ using UnityEngine;
 [Serializable]
 public class ObjectPlacerTerrainModLayer : TerrainModLayer
 {
+    private static bool layersSet = false;
+    private static List<TreePrototype> objects = new List<TreePrototype>();
+
+    public bool createNavMeshAfterPlacing = false;
     public float[,,] splatMap = null;
 
     public bool disabled;
@@ -38,32 +42,46 @@ public class ObjectPlacerTerrainModLayer : TerrainModLayer
         Tool.OnValidate();
     }
 
-    private void SetLayers()
+    public void AddPrototypes()
     {
-        List<TreePrototype> objects = new List<TreePrototype>();
-        int index = 0;
+        int index = objects.Count;
         for (int i = 0; i < layers.Length; i++)
         {
             layers[i].indexes = new int[layers[i].objects.Length];
             for (int j = 0; j < layers[i].objects.Length; j++)
             {
-                var tree  = new TreePrototype();
+                var tree = new TreePrototype();
                 tree.prefab = layers[i].objects[j];
                 tree.bendFactor = 0.2f;
-                tree.navMeshLod = 0; 
+                tree.navMeshLod = 0;
                 objects.Add(tree);
                 layers[i].indexes[j] = index;
                 index++;
             }
         }
+    }
+
+    public void ResetLayers()
+    {
+        objects.Clear();
+        layersSet = false;
+    }
+
+    public void SetLayers()
+    {   
+        if (layersSet)
+        {
+            return;
+        }
+        layersSet = true;
         Tool._TerrainData.treePrototypes = objects.ToArray();
         Tool._TerrainData.RefreshPrototypes();
+        Tool._TerrainData.SetTreeInstances(new TreeInstance[0], true);
     }
 
     public override void Rebuild()
     {
         SetLayers();
-        Tool._TerrainData.SetTreeInstances(new TreeInstance[0], true);
 
         if (disabled)
         {
@@ -172,5 +190,10 @@ public class ObjectPlacerTerrainModLayer : TerrainModLayer
     public override void Apply()
     {
         Rebuild();
+        if (createNavMeshAfterPlacing)
+        {
+            NavMeshBaker baker = new NavMeshBaker();
+            baker.Bake();
+        }
     }
 }
