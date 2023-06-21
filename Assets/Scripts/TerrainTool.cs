@@ -85,6 +85,12 @@ public class TerrainTool : MonoBehaviour
         }
     }
 
+    public void TriggerRebuild()
+    {
+        RebuildAll = true;
+        RefreshTerrain();
+    }
+
     public void RefreshTerrain()
     {
         size = _TerrainData.size;

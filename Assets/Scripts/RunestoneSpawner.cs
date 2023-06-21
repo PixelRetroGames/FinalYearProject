@@ -73,6 +73,7 @@ public class RunestoneSpawner : TerrainModLayer
     {
         var obj = Instantiate(runestonePrefab.gameObject);
         obj.transform.position += pos;
+        obj.transform.parent = Tool.transform;
         spawnedObjects.Add(obj);
     }
 

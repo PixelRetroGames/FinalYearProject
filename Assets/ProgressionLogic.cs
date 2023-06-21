@@ -20,4 +20,9 @@ public class ProgressionLogic : MonoBehaviour
 
         }
     }
+
+    public void Reset()
+    {
+        objectivesCompleted = 0;
+    }
 }
