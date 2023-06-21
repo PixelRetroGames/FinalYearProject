@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e6ec6a9d31ffe34687ebb31d3703125, type: 3}
+  m_Name: New Runestone Spawner
+  m_EditorClassIdentifier: 
+  Tool: {fileID: 0}
+  runestonePrefab: {fileID: 738290239777050560, guid: 197210babfa7e8843a90cc3ce15b2de7, type: 3}
+  runestonesSpawnProps:
+  - minDist: 20
+    maxDist: 30
+  - minDist: 30
+    maxDist: 40
+  - minDist: 40
+    maxDist: 50
+  - minDist: 50
+    maxDist: 60
+  runestonesIllegalDistance: 5

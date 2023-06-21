@@ -13,6 +13,10 @@ MonoBehaviour:
   m_Name: New Terrain Painter Terrain Mod Layer
   m_EditorClassIdentifier: 
   Tool: {fileID: 0}
+  safeZonePosition: {x: 0, y: 0, z: 0}
+  safeZoneRadius: 100
+  safeZoneHardness: 0.1
+  bordersHardness: 0
   scale: 0.04
   layers:
   - terrainLayer: {fileID: 8574412962073106934, guid: bd1fcb10d2c5b5d4ba6e01a34e4735be, type: 2}

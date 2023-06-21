@@ -9,6 +9,9 @@ using UnityEngine;
 [Serializable]
 public class ObjectPlacerTerrainModLayer : TerrainModLayer
 {
+    // position and distance
+    private static List<Tuple<Vector3, float>> illegalZones = new List<Tuple<Vector3, float>>();
+
     private static bool layersSet = false;
     private static List<TreePrototype> objects = new List<TreePrototype>();
 
@@ -40,6 +43,11 @@ public class ObjectPlacerTerrainModLayer : TerrainModLayer
     public void OnValidate()
     {
         Tool.OnValidate();
+    }
+
+    public void SetIllegalZones(List<Tuple<Vector3, float>> illegals)
+    {
+        illegalZones = illegals;
     }
 
     public void AddPrototypes()
@@ -135,8 +143,10 @@ public class ObjectPlacerTerrainModLayer : TerrainModLayer
                         continue;
                     }
 
-                    Spawn(y, x, layer);
-                    placed[x, y] = true;
+                    if (Spawn(y, x, layer))
+                    {
+                        placed[x, y] = true;
+                    }
                 }
             }
 
@@ -168,8 +178,18 @@ public class ObjectPlacerTerrainModLayer : TerrainModLayer
         Tool._Terrain.Flush();
     }
 
-    private void Spawn(float x, float y, int layer)
+    private bool Spawn(float x, float y, int layer)
     {
+        var pos = GetWorldPosition(x, y);
+
+        foreach (var illegal in illegalZones)
+        {
+            if (Vector3.Distance(pos, illegal.Item1) < illegal.Item2)
+            {
+                return false;
+            }
+        }
+
         TreeInstance treeTemp = new TreeInstance();
 
         var width = Tool._TerrainData.alphamapWidth;
@@ -185,6 +205,7 @@ public class ObjectPlacerTerrainModLayer : TerrainModLayer
         //treeTemp.color = Color.white;
         //treeTemp.lightmapColor = Color.white;
         Tool._Terrain.AddTreeInstance(treeTemp);
+        return true;
     }
 
     public override void Apply()

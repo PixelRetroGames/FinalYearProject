@@ -12,10 +12,13 @@ public class RuneStoneLogic : MonoBehaviour
     public ParticleSystem particles;
     public Renderer renderer;
 
+    private ProgressionLogic progression;
+
     // Start is called before the first frame update
     void Start()
     {
         particles.Stop();
+        progression = GameObject.FindGameObjectWithTag("ProgressionLogic").GetComponent<ProgressionLogic>();
     }
 
     // Update is called once per frame
@@ -27,6 +30,7 @@ public class RuneStoneLogic : MonoBehaviour
         }
         if (ritualCompletion == 1)
         {
+            progression.MarkCompleted();
             triggered = false;
             particles.Stop();
             return;

@@ -1,8 +1,19 @@
+using System;
+using System.Collections.Generic;
+using UnityEditor.TextCore.Text;
 using UnityEngine;
 
-[ExecuteAlways]
+[ExecuteInEditMode]
 public class TerrainTool : MonoBehaviour
 {
+    public Vector3 safeZonePosition;
+    public float safeZoneRadius;
+    public float safeZoneHardness;
+
+    public float borderZoneOffsetRadius;
+    public float borderZoneRadius;
+    public float borderZoneHardness;
+
     public Terrain _Terrain;
     public TerrainData _TerrainData;
 
@@ -33,9 +44,11 @@ public class TerrainTool : MonoBehaviour
     private float[,] _Mesh;
     private Vector3 size;
     private Vector3 scale;
+    private bool refresh = false;
 
     public void OnEnable()
     {
+        RebuildAll = false;
         foreach (var layer in Layers)
         {
             layer.Layer.Tool = this;
@@ -52,25 +65,61 @@ public class TerrainTool : MonoBehaviour
         return null;
     }
 
+    public void Update()
+    {
+        if (Application.isPlaying) return;
+
+        if (!refresh)
+        {
+            return;
+        }
+        refresh = false;
+        RefreshTerrain();
+    }
+
     public void OnValidate()
     {
-        RefreshTerrain();
+        if (RebuildAll == true)
+        {
+            refresh = true;
+        }
     }
 
     public void RefreshTerrain()
     {
-        HeightRes = _TerrainData.heightmapResolution;
         size = _TerrainData.size;
+        HeightRes = _TerrainData.heightmapResolution;
         scale = size / HeightRes;
         Mesh = new float[HeightRes, HeightRes];
 
         if (Layers != null)
         {
+            var illegalZones = new List<Tuple<Vector3, float>>();
             if (RebuildAll)
             {
+                transform.SetPositionAndRotation(new Vector3(-size.x / 2, 0, -size.z / 2), Quaternion.identity);
                 bool reset = false;
+
                 foreach (var layer in Layers)
                 {
+                    layer.Layer.Tool = this;
+                    if (layer.Layer.GetType() == typeof(RunestoneSpawner))
+                    {
+                        var spawner = (RunestoneSpawner)layer.Layer;
+                        spawner.SetSafeZone(safeZonePosition);
+                        spawner.ComputeSpawnPositions();
+
+                        illegalZones.AddRange(spawner.GetRunestonesIllegalAreas());
+                    }
+
+                    if (layer.Layer.GetType() == typeof(TerrainPainterTerrainModLayer))
+                    {
+                        var painter = ((TerrainPainterTerrainModLayer)layer.Layer);
+                        painter.SetSafeZone(safeZonePosition, safeZoneRadius, safeZoneHardness);
+                        painter.SetBorderZone(borderZoneOffsetRadius, borderZoneRadius, borderZoneHardness);
+                        illegalZones.Add(new Tuple<Vector3, float>(safeZonePosition, safeZoneRadius));
+                    }
+
                     if (layer.Layer.GetType() == typeof(ObjectPlacerTerrainModLayer))
                     {
                         if (!reset)
@@ -84,16 +133,19 @@ public class TerrainTool : MonoBehaviour
             }
 
             foreach (var layer in Layers)
-            {
-                layer.Layer.Tool = this;
+            {       
                 if (layer.Rebuild || RebuildAll)
                 {
+                    if (layer.Layer.GetType() == typeof(ObjectPlacerTerrainModLayer))
+                    {
+                        ((ObjectPlacerTerrainModLayer)layer.Layer).SetIllegalZones(illegalZones);
+                    }
                     layer.Layer.Rebuild();
                     layer.Layer.Apply();
                     layer.Rebuild = false;
                 }
             }
-            RebuildAll= false;
+            RebuildAll = false;
         }
 
         _TerrainData.SetHeights(0, 0, _Mesh);
