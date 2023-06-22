@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEditor.SceneManagement;
 using UnityEditor.TextCore.Text;
 using UnityEngine;
 
@@ -16,6 +17,7 @@ public class TerrainTool : MonoBehaviour
 
     public Terrain _Terrain;
     public TerrainData _TerrainData;
+    private TerrainCollider _TerrainCollider;
 
     public float[,] Mesh
     {
@@ -67,7 +69,7 @@ public class TerrainTool : MonoBehaviour
 
     public void Update()
     {
-        if (Application.isPlaying) return;
+        //if (Application.isPlaying) return;
 
         if (!refresh)
         {
@@ -88,7 +90,8 @@ public class TerrainTool : MonoBehaviour
     public void TriggerRebuild()
     {
         RebuildAll = true;
-        RefreshTerrain();
+        refresh = true;
+        //RefreshTerrain();
     }
 
     public void RefreshTerrain()
@@ -155,6 +158,9 @@ public class TerrainTool : MonoBehaviour
         }
 
         _TerrainData.SetHeights(0, 0, _Mesh);
+
+        _TerrainCollider = gameObject.AddComponent(typeof(TerrainCollider)) as TerrainCollider;
+        _TerrainCollider.terrainData = _TerrainData;
     }
 
     public Vector3 WorldPositionFromHeightMapIndex(int x, int y)

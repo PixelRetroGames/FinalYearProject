@@ -42,7 +42,7 @@ public class ObjectPlacerTerrainModLayer : TerrainModLayer
 
     public void OnValidate()
     {
-        Tool.OnValidate();
+        //Tool.OnValidate();
     }
 
     public void SetIllegalZones(List<Tuple<Vector3, float>> illegals)
