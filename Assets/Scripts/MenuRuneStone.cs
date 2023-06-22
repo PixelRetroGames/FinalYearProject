@@ -15,10 +15,13 @@ public class MenuRuneStone : MonoBehaviour
     public ParticleSystem particles;
     public Renderer renderer;
 
+    private Vector4 originalColor;
+
     // Start is called before the first frame update
     void Start()
     {
         particles.Stop();
+        originalColor = renderer.material.GetVector("_Tint");
     }
 
     // Update is called once per frame
@@ -62,5 +65,13 @@ public class MenuRuneStone : MonoBehaviour
     {
         particles.Stop();
         triggered = false;
+    }
+
+    public void Reset()
+    {
+        ritualCompletion = 0;
+        triggered = false;
+        particles.Stop();
+        renderer.material.SetVector("_Tint", originalColor);
     }
 }

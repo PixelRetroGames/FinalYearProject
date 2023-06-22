@@ -17,7 +17,7 @@ public class TerrainTool : MonoBehaviour
 
     public Terrain _Terrain;
     public TerrainData _TerrainData;
-    private TerrainCollider _TerrainCollider;
+    public TerrainCollider _TerrainCollider;
 
     public float[,] Mesh
     {
@@ -158,6 +158,16 @@ public class TerrainTool : MonoBehaviour
         }
 
         _TerrainData.SetHeights(0, 0, _Mesh);
+
+        if (_TerrainCollider == null)
+        {
+            _TerrainCollider = gameObject.GetComponent<TerrainCollider>();
+        }
+
+        if (_TerrainCollider != null)
+        {
+            DestroyImmediate(_TerrainCollider);
+        }
 
         _TerrainCollider = gameObject.AddComponent(typeof(TerrainCollider)) as TerrainCollider;
         _TerrainCollider.terrainData = _TerrainData;

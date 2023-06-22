@@ -7,6 +7,13 @@ public class ProgressionLogic : MonoBehaviour
     public int objectivesCompleted = 0;
     private int numObjectives = 0;
 
+    private GameStateManager manager;
+
+    public void Start()
+    {
+        manager = GameObject.Find("GameStateManager").GetComponent<GameStateManager>();
+    }
+
     public void SetNumObjectives(int numObjectives)
     {
         this.numObjectives = numObjectives;
@@ -17,7 +24,7 @@ public class ProgressionLogic : MonoBehaviour
         objectivesCompleted++;
         if (objectivesCompleted == numObjectives)
         {
-
+            manager.WonGame();
         }
     }
 
