@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 [CreateAssetMenu(menuName = "Terrain/Layers/RunestoneSpawner")]
 [Serializable]
@@ -64,9 +65,13 @@ public class RunestoneSpawner : TerrainModLayer
 
     public override void Apply()
     {
-       foreach(var pos in runestonesPositions) {
+        //var targetingLogic = GameObject.Find("TargetingSystem").GetComponent<EnemyTargetingLogic>();
+        int i = 0;
+        foreach(var pos in runestonesPositions) {
             Spawn(pos);
-       }
+            //targetingLogic.AddTarget(spawnedObjects[i], 0.2f);
+            i++;
+        }
     }
 
     private void Spawn(Vector3 pos)

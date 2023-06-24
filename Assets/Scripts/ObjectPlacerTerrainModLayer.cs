@@ -2,6 +2,7 @@ using Cinemachine;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Unity.AI.Navigation;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -31,6 +32,10 @@ public class ObjectPlacerTerrainModLayer : TerrainModLayer
         public bool disabled;
         [Range(0.0f, 1.0f)]
         public float noSpawnChance;
+        [Range(0.0f, 1.0f)]
+        public float splatmapNoSpwanChance = 0;
+        [Range(0.0f, 1.0f)]
+        public float splatmapMultiplier = 1f;
 
         [Range(0.0f, 1.0f)]
         public float threshold;
@@ -112,11 +117,16 @@ public class ObjectPlacerTerrainModLayer : TerrainModLayer
             {
                 for (int y = 0; y < height; y++)
                 {
-                    float p = UnityEngine.Random.Range(0.0f, 1.0f) * (splatMap[x, y, splatMapLayer]);
+                    float noSpawn = UnityEngine.Random.Range(0.0f, 1.0f);
+                    //float splatmapNoSpawnChance = UnityEngine.Random.Range(0.0f, 1.0f) * (splatMap[x, y, splatMapLayer] * splatmapMultiplier);
+                    float splatmapNoSpawnChance = UnityEngine.Random.Range(0.0f, 1.0f);
+                    //float p = UnityEngine.Random.Range(0.0f, 1.0f) * (splatMap[x, y, splatMapLayer] * splatmapMultiplier);
+                    //float p = (splatMap[x, y, splatMapLayer] * splatmapMultiplier);
 
                     if (/*p > splatMap[x, y, splatMapLayer] || */
                         splatMap[x, y, splatMapLayer] < layers[layer].threshold ||
-                        p < layers[layer].noSpawnChance)
+                        noSpawn < layers[layer].noSpawnChance ||
+                        splatmapNoSpawnChance < 1f - (splatMap[x, y, splatMapLayer] * layers[layer].splatmapMultiplier))
                     {
                         continue;
                     }
@@ -214,7 +224,15 @@ public class ObjectPlacerTerrainModLayer : TerrainModLayer
         if (createNavMeshAfterPlacing)
         {
             NavMeshBaker baker = new NavMeshBaker();
-            baker.Bake();
+
+            var setter = new TerrainNavMeshObstacleSetter(Tool);
+            setter.Set();
+
+            var surface = Tool.GetComponentInParent<NavMeshSurface>();
+
+            baker.Bake(surface);
+
+            setter.Reset();
         }
     }
 }

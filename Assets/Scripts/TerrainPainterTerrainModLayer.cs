@@ -57,7 +57,10 @@ public class TerrainPainterTerrainModLayer : TerrainModLayer
         {
             terrainLayers[i] = layers[i].terrainLayer;
         }
+
+        #if UNITY_EDITOR
         Tool._TerrainData.SetTerrainLayersRegisterUndo(terrainLayers, "updated layers");
+        #endif
     }
 
     public override void Rebuild()

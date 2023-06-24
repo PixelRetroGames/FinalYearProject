@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEditor.SceneManagement;
-using UnityEditor.TextCore.Text;
 using UnityEngine;
 
 [ExecuteInEditMode]
@@ -91,7 +89,9 @@ public class TerrainTool : MonoBehaviour
     {
         RebuildAll = true;
         refresh = true;
-        //RefreshTerrain();
+        RefreshTerrain();
+        RebuildAll = false;
+        refresh = false;
     }
 
     public void RefreshTerrain()
@@ -158,7 +158,6 @@ public class TerrainTool : MonoBehaviour
         }
 
         _TerrainData.SetHeights(0, 0, _Mesh);
-
         if (_TerrainCollider == null)
         {
             _TerrainCollider = gameObject.GetComponent<TerrainCollider>();
@@ -168,7 +167,6 @@ public class TerrainTool : MonoBehaviour
         {
             DestroyImmediate(_TerrainCollider);
         }
-
         _TerrainCollider = gameObject.AddComponent(typeof(TerrainCollider)) as TerrainCollider;
         _TerrainCollider.terrainData = _TerrainData;
     }
@@ -190,5 +188,12 @@ public class TerrainTool : MonoBehaviour
         y += 0 - _Terrain.transform.position.y;
         return y / size.y;
 
+    }
+
+    public float GetWorldScale(float x)
+    {
+        var width = _TerrainData.alphamapWidth;
+        float realW = _TerrainData.size.x;
+        return ((float)x) * width / realW / 2f;
     }
 }

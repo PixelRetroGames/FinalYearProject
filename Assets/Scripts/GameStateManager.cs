@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,6 +21,11 @@ public class GameStateManager : MonoBehaviour
 
     private GameStates state;
 
+    public void Start()
+    {
+        menuWorld.GetComponentInChildren<TerrainTool>().TriggerRebuild();
+    }
+
     public void StartGame()
     {
         //menuWorld.GetComponentInChildren<TerrainCollider>().enabled = false;
@@ -27,13 +33,16 @@ public class GameStateManager : MonoBehaviour
         menuWorld.SetActive(false);
 
         terrain.SetActive(true);
+        var safezone = GameObject.Find("SafeZone").GetComponent<SafeZoneLogic>();
+        safezone.Reset();
+        safezone.DisableTrigger();
+        enemy.SetActive(true);
         terrain.GetComponent<TerrainTool>().TriggerRebuild();
+        safezone.EnableTrigger();
 
         GameObject.Find("Player").transform.position = new Vector3(0, 0.5f, 0);
         GameObject.Find("Progression").GetComponent<ProgressionLogic>().Reset();
-
-        enemy.SetActive(true);
-        enemy.transform.position = new Vector3(30, 0, 30);
+        enemy.GetComponent<EnemyMovement>().Spawn();
     }
 
     private void Update()
@@ -59,15 +68,15 @@ public class GameStateManager : MonoBehaviour
 
     private void EndGame(bool won)
     {
-        menuWorld.SetActive(true);
-        menuWorld.GetComponentInChildren<TerrainTool>().TriggerRebuild();
-
         terrain.SetActive(false);
 
         GameObject.Find("Player").transform.position = new Vector3(0, 0.5f, 0);
         GameObject.Find("Progression").GetComponent<ProgressionLogic>().Reset();
 
         enemy.SetActive(false);
+
+        menuWorld.SetActive(true);
+        menuWorld.GetComponentInChildren<TerrainTool>().TriggerRebuild();
 
         GameObject.Find("MenuWorld/MenuElements/RetryRune/RetryText").SetActive(!won);
         GameObject.Find("MenuWorld/MenuElements/RetryRune/PlayText").SetActive(won);

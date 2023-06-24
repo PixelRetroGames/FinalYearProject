@@ -15,12 +15,14 @@ MonoBehaviour:
   Tool: {fileID: 0}
   runestonePrefab: {fileID: 738290239777050560, guid: 197210babfa7e8843a90cc3ce15b2de7, type: 3}
   runestonesSpawnProps:
-  - minDist: 20
-    maxDist: 30
-  - minDist: 30
-    maxDist: 40
-  - minDist: 40
-    maxDist: 50
-  - minDist: 50
-    maxDist: 60
-  runestonesIllegalDistance: 5
+  - minDist: 70
+    maxDist: 100
+  - minDist: 100
+    maxDist: 150
+  - minDist: 150
+    maxDist: 200
+  - minDist: 200
+    maxDist: 250
+  - minDist: 200
+    maxDist: 250
+  runestonesIllegalDistance: 20
