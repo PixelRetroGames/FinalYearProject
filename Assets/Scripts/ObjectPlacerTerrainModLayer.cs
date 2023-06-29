@@ -118,13 +118,9 @@ public class ObjectPlacerTerrainModLayer : TerrainModLayer
                 for (int y = 0; y < height; y++)
                 {
                     float noSpawn = UnityEngine.Random.Range(0.0f, 1.0f);
-                    //float splatmapNoSpawnChance = UnityEngine.Random.Range(0.0f, 1.0f) * (splatMap[x, y, splatMapLayer] * splatmapMultiplier);
                     float splatmapNoSpawnChance = UnityEngine.Random.Range(0.0f, 1.0f);
-                    //float p = UnityEngine.Random.Range(0.0f, 1.0f) * (splatMap[x, y, splatMapLayer] * splatmapMultiplier);
-                    //float p = (splatMap[x, y, splatMapLayer] * splatmapMultiplier);
 
-                    if (/*p > splatMap[x, y, splatMapLayer] || */
-                        splatMap[x, y, splatMapLayer] < layers[layer].threshold ||
+                    if (splatMap[x, y, splatMapLayer] < layers[layer].threshold ||
                         noSpawn < layers[layer].noSpawnChance ||
                         splatmapNoSpawnChance < 1f - (splatMap[x, y, splatMapLayer] * layers[layer].splatmapMultiplier))
                     {

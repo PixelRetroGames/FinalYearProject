@@ -50,32 +50,43 @@ public class EnemyMovement : MonoBehaviour
 
         transform.position = illegalPos;
 
-        if (NavMesh.SamplePosition(transform.position, out hit, 30f, NavMesh.AllAreas))
+        if (NavMesh.SamplePosition(illegalPos + illegalRange * new Vector3(1, 0, 0), out hit, 30f, 0))
         {
             transform.position = hit.position;
         }
 
+        int maxRetries = 30;
+
         do
         {
-            var x = UnityEngine.Random.Range(-w, w);
-            var z = UnityEngine.Random.Range(-h, h);
+            float angleRad = UnityEngine.Random.Range(0f, 2 * Mathf.PI);
+            Vector3 angle = new Vector3(Mathf.Sin(angleRad), 0, Mathf.Cos(angleRad));
+
+            pos = illegalPos + angle * UnityEngine.Random.Range(illegalRange + w / 4, w / 2);
+
+            var x = pos.x;
+            var z = pos.z;
+
+            //var x = UnityEngine.Random.Range(-w, w);
+            //var z = UnityEngine.Random.Range(-h, h);
             pos = new Vector3(x, 0, z);
 
-            if (Vector3.Distance(illegalPos, pos) < illegalRange)
+            /*if (Vector3.Distance(illegalPos, pos) < illegalRange)
             {
                 continue;
-            }
+            }*/
 
-            if (NavMesh.SamplePosition(pos, out hit, 30f, NavMesh.AllAreas))
+            if (NavMesh.SamplePosition(pos, out hit, 30f, 0))
             {
                 pos = hit.position;
             }
 
             agent.CalculatePath(pos, path);
-            break;
-        } while (path.status != NavMeshPathStatus.PathComplete);
+            maxRetries--;
+        } while (path.status != NavMeshPathStatus.PathComplete && maxRetries > 0);
 
-        transform.position = pos;
+        agent.Warp(pos);
+        Debug.Log("position = " + pos.ToString());
 
         //targetingLogic.AddTarget(GameObject.Find("Player"));
     }
