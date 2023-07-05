@@ -5,25 +5,91 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class EnemyMovement : MonoBehaviour
+public class EnemyMovement : AgentMovement
 {
-    private NavMeshAgent agent;
-    [SerializeField] private Transform target;
-
     private GameStateManager manager;
     private EnemyTargetingLogic targetingLogic;
+
+    [SerializeField]
+    private float changeTargetTime = 0f;
+    [SerializeField]
+    private float changeTargetTimeElapsed = 0f;
+
+    [SerializeField]
+    private float updateTargetPosTime = 0f;
+    [SerializeField]
+    private float updateTargetPosTimeElapsed = 0f;
+
+    public float abandonTargetTreshold;
+    public float huntTargetTreshold;
+
+    private float targetPriority;
 
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
         manager = GameObject.Find("GameStateManager").GetComponent<GameStateManager>();
-        //targetingLogic = GetComponentInChildren<EnemyTargetingLogic>();
+        targetingLogic = GetComponentInChildren<EnemyTargetingLogic>();
+        //targetingLogic.AddTarget(GameObject.Find("Player"));
+    }
+
+    private void Reset()
+    {
+        changeTargetTimeElapsed = 0f;
+        updateTargetPosTimeElapsed = 0f;
+    }
+
+    private void UpdateTargetPos()
+    {
+        if (updateTargetPosTimeElapsed > 0)
+        {
+            updateTargetPosTimeElapsed -= Time.deltaTime;
+            return;
+        }
+
+        updateTargetPosTimeElapsed = updateTargetPosTime;
+
+        if (target != null)
+        {
+            targetPosition = target.position;
+        }
+
+        NavMeshPath path = new NavMeshPath();
+
+        agent.CalculatePath(targetPosition, path);
+        agent.SetPath(path);
+
+        //agent.SetDestination(targetPosition);
     }
 
     private void Update()
     {
-        //target = targetingLogic.GetTarget();
-        agent.destination = target.position;
+        if (target != null)
+        {
+            targetPriority = targetingLogic.GetTargetPriority(target.gameObject);
+
+            if (targetingLogic.GetTargetPriority() > huntTargetTreshold)
+            {
+                targetPriority = 0f;
+            }
+        }
+
+        if (changeTargetTimeElapsed > 0 && targetPriority > abandonTargetTreshold)
+        {
+            UpdateTargetPos();
+            changeTargetTimeElapsed -= Time.deltaTime;
+            return;
+        }
+
+        changeTargetTimeElapsed = changeTargetTime;
+
+        target = targetingLogic.GetTarget();
+        targetPosition = targetingLogic.GetTargetPosition();
+        targetPriority = targetingLogic.GetTargetPriority();
+
+        UpdateTargetPos();
+
+        //agent.SetDestination(targetPosition);
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -31,63 +97,24 @@ public class EnemyMovement : MonoBehaviour
         if (collision.gameObject.GetComponent<PlayerMovement>() != null)
         {
             manager.LostGame();
+            return;
+        }
+
+        if (collision.gameObject.GetComponent<NPCLogic>() != null)
+        {
+            targetingLogic.RemoveTarget(collision.gameObject);
+            Destroy(collision.gameObject);
+            changeTargetTimeElapsed = 0f;
+            return;
         }
     }
 
     public void Spawn()
     {
-        var terrain = GameObject.Find("Terrain");
-        float w = -terrain.transform.position.x;
-        float h = -terrain.transform.position.z;
-
-        var safeZone = GameObject.Find("SafeZone");
-        var illegalPos = safeZone.transform.position;
-        var illegalRange = safeZone.transform.localScale.x;
-
-        Vector3 pos;
-        NavMeshPath path = new NavMeshPath();
-        NavMeshHit hit = new NavMeshHit();
-
-        transform.position = illegalPos;
-
-        if (NavMesh.SamplePosition(illegalPos + illegalRange * new Vector3(1, 0, 0), out hit, 30f, 0))
-        {
-            transform.position = hit.position;
-        }
-
-        int maxRetries = 30;
-
-        do
-        {
-            float angleRad = UnityEngine.Random.Range(0f, 2 * Mathf.PI);
-            Vector3 angle = new Vector3(Mathf.Sin(angleRad), 0, Mathf.Cos(angleRad));
-
-            pos = illegalPos + angle * UnityEngine.Random.Range(illegalRange + w / 4, w / 2);
-
-            var x = pos.x;
-            var z = pos.z;
-
-            //var x = UnityEngine.Random.Range(-w, w);
-            //var z = UnityEngine.Random.Range(-h, h);
-            pos = new Vector3(x, 0, z);
-
-            /*if (Vector3.Distance(illegalPos, pos) < illegalRange)
-            {
-                continue;
-            }*/
-
-            if (NavMesh.SamplePosition(pos, out hit, 30f, 0))
-            {
-                pos = hit.position;
-            }
-
-            agent.CalculatePath(pos, path);
-            maxRetries--;
-        } while (path.status != NavMeshPathStatus.PathComplete && maxRetries > 0);
+        var pos = GetReachablePosition();
 
         agent.Warp(pos);
         Debug.Log("position = " + pos.ToString());
-
-        //targetingLogic.AddTarget(GameObject.Find("Player"));
+        Reset();
     }
 }

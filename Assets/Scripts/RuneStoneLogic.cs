@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class RuneStoneLogic : MonoBehaviour
@@ -13,6 +15,16 @@ public class RuneStoneLogic : MonoBehaviour
     public Renderer renderer;
 
     private ProgressionLogic progression;
+
+    private List<GameObject> playersInRange = new List<GameObject>();
+
+    private GameObject direction;
+
+    public void SetDirection(GameObject direction)
+    {
+        this.direction = direction;
+    }
+
 
     // Start is called before the first frame update
     void Start()
@@ -28,13 +40,21 @@ public class RuneStoneLogic : MonoBehaviour
         {
             return;
         }
+
         if (ritualCompletion == 1)
         {
             progression.MarkCompleted();
             triggered = false;
             particles.Stop();
+
+            direction.SetActive(true);
+            direction.GetComponent<DirectionScript>().Activate();
+
             return;
         }
+
+        // Take care of destroyed players in range
+        SanitizePlayerList();
         
         ritualCompletion = Mathf.Min(1.0f, ritualCompletion + completionPerSecond * Time.deltaTime);
         var hsl = renderer.material.GetVector("_Tint");
@@ -49,8 +69,29 @@ public class RuneStoneLogic : MonoBehaviour
         renderer.material.SetVector("_Tint", hsl);
     }
 
+    private void SanitizePlayerList()
+    {
+        var destroyedPlayers = GetDestroyedPlayers();
+        foreach (var player in destroyedPlayers)
+        {
+            OnTriggerExit(player.GetComponent<Collider>());
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
+        if (other.gameObject.GetComponent<EnemyTarget>() == null)
+        {
+            return;
+        }
+
+        playersInRange.Add(other.gameObject);
+
+        if (playersInRange.Count > 1)
+        {
+            return;
+        }
+
         if (ritualCompletion == 1.0f) {
             return;
         }
@@ -60,7 +101,50 @@ public class RuneStoneLogic : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
+        if (other.gameObject.GetComponent<EnemyTarget>() == null)
+        {
+            return;
+        }
+
+        playersInRange.Remove(other.gameObject);
+
         particles.Stop();
-        triggered = false;
+
+        if (playersInRange.Count == 0)
+        {
+            triggered = false;
+        }
+    }
+
+    public bool IsCompleted()
+    {
+        return ritualCompletion == 1f;
+    }
+
+    private List<GameObject> GetDestroyedPlayers()
+    {
+        var destroyedPlayers = new List<GameObject>();
+        foreach (var player in playersInRange)
+        {
+            if (WasDestroyed(player))
+            {
+                destroyedPlayers.Add(player);
+            }
+        }
+
+        return destroyedPlayers;
+    }
+
+    private static bool WasDestroyed(GameObject obj)
+    {
+        try
+        {
+            if (obj.gameObject == null) return true;
+        }
+        catch (Exception)
+        {
+            return true;
+        }
+        return false;
     }
 }

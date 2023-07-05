@@ -1,26 +1,34 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Unity.Burst.Intrinsics.X86.Avx;
 
 [ExecuteInEditMode]
 public class SafeZoneLogic : MonoBehaviour
 {
     public float priorityDecreaseRate;
+    public float priorityIncreaseRate;
     public float rotationSpeed = 0;
     private float angle = 0;
     private List<GameObject> playersSafe = new List<GameObject>();
+    private List<GameObject> playersUnsafe = new List<GameObject>();
     EnemyTargetingLogic enemyTargeting;
     public TerrainTool terrain;
     private Collider collider;
 
+    [SerializeField]
+    private NPCSpawner npcSpawner;
+
     // Start is called before the first frame update
     void Start()
     {
-        transform.localScale = terrain.safeZoneRadius * new Vector3(1, 0, 1) * 0.2f;
+        transform.localScale = terrain.safeZoneRadius * new Vector3(1, 0, 1);
         transform.position = new Vector3(terrain.safeZonePosition.x, transform.position.y, terrain.safeZonePosition.z);
         angle = 0;
-        //enemyTargeting = GameObject.Find("TargetingSystem").GetComponent<EnemyTargetingLogic>();
+        enemyTargeting = GameObject.Find("TargetingSystem").GetComponent<EnemyTargetingLogic>();
         collider = GetComponent<Collider>();
+        npcSpawner.Spawn(transform.position, transform.localScale.x);
     }
 
     public void Reset()
@@ -47,27 +55,65 @@ public class SafeZoneLogic : MonoBehaviour
     void Update()
     {
         angle += rotationSpeed + Time.deltaTime;
-        transform.rotation = Quaternion.Euler(0, angle, 0);
+        transform.GetChild(0).transform.rotation = Quaternion.Euler(90, angle, 0);
+
+        SanitizePlayerList(playersSafe);
+        SanitizePlayerList(playersUnsafe);
 
         foreach (var player in playersSafe)
         {
-            //enemyTargeting.IncreasePriorityForTarget(player, priorityDecreaseRate * Time.deltaTime);
+            enemyTargeting.IncreasePriorityForTarget(player, -priorityDecreaseRate * Time.deltaTime);
+        }
+
+        foreach (var player in playersUnsafe)
+        {
+            enemyTargeting.IncreasePriorityForTarget(player, priorityIncreaseRate * Time.deltaTime);
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void SanitizePlayerList(List<GameObject> playerList)
     {
-        if (collision.gameObject.GetComponent<PlayerMovement>() != null)
+        for (int i = playerList.Count - 1; i >= 0; i--)
         {
-            playersSafe.Add(collision.gameObject);
+            if (WasDestroyed(playerList[i]))
+            {
+                playerList.RemoveAt(i);
+            }
         }
     }
 
-    private void OnCollisionExit(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if (collision.gameObject.GetComponent<PlayerMovement>() != null)
+        var obj = other.gameObject;
+
+        if (obj.gameObject.GetComponent<EnemyTarget>() != null)
         {
-            playersSafe.Remove(collision.gameObject);
+            playersSafe.Add(obj.gameObject);
+            playersUnsafe.Remove(obj.gameObject);
         }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        var obj = other.gameObject;
+
+        if (obj.gameObject.GetComponent<EnemyTarget>() != null)
+        {
+            playersSafe.Remove(obj.gameObject);
+            playersUnsafe.Add(obj.gameObject);
+        }
+    }
+
+    private static bool WasDestroyed(GameObject obj)
+    {
+        try
+        {
+            if (obj.gameObject == null) return true;
+        }
+        catch (Exception)
+        {
+            return true;
+        }
+        return false;
     }
 }

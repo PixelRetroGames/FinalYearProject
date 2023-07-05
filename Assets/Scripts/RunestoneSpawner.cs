@@ -9,6 +9,7 @@ using UnityEngine.AI;
 public class RunestoneSpawner : TerrainModLayer
 {
     public GameObject runestonePrefab;
+    public GameObject direction;
     // tuple of min dist and max dist
 
     [System.Serializable]
@@ -65,11 +66,11 @@ public class RunestoneSpawner : TerrainModLayer
 
     public override void Apply()
     {
-        //var targetingLogic = GameObject.Find("TargetingSystem").GetComponent<EnemyTargetingLogic>();
+        direction = GameObject.Find("Direction");
+
         int i = 0;
         foreach(var pos in runestonesPositions) {
             Spawn(pos);
-            //targetingLogic.AddTarget(spawnedObjects[i], 0.2f);
             i++;
         }
     }
@@ -79,6 +80,7 @@ public class RunestoneSpawner : TerrainModLayer
         var obj = Instantiate(runestonePrefab.gameObject);
         obj.transform.position += pos;
         obj.transform.parent = Tool.transform;
+        obj.GetComponentInChildren<RuneStoneLogic>().SetDirection(direction);
         spawnedObjects.Add(obj);
     }
 

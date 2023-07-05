@@ -224,9 +224,12 @@ public class ObjectPlacerTerrainModLayer : TerrainModLayer
             var setter = new TerrainNavMeshObstacleSetter(Tool);
             setter.Set();
 
-            var surface = Tool.GetComponentInParent<NavMeshSurface>();
+            var surfaces = Tool.GetComponentsInParent<NavMeshSurface>();
 
-            baker.Bake(surface);
+            foreach (var surface in surfaces)
+            {
+                baker.Bake(surface);
+            }
 
             setter.Reset();
         }

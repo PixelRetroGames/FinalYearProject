@@ -8,6 +8,9 @@ public class GameStateManager : MonoBehaviour
     public GameObject menuWorld;
     public GameObject terrain;
     public GameObject enemy;
+    public PlayerMovement player;
+    public GameObject npcs;
+    public GameObject direction;
 
     public MenuRuneStone exitRune;
     public MenuRuneStone retryRune;
@@ -33,16 +36,23 @@ public class GameStateManager : MonoBehaviour
         menuWorld.SetActive(false);
 
         terrain.SetActive(true);
+        npcs.SetActive(true);
+        player.Reset();
+        player.SetSignPlacement(true);
+
+        enemy.SetActive(true);
+        direction.SetActive(true);
         var safezone = GameObject.Find("SafeZone").GetComponent<SafeZoneLogic>();
         safezone.Reset();
         safezone.DisableTrigger();
-        enemy.SetActive(true);
         terrain.GetComponent<TerrainTool>().TriggerRebuild();
         safezone.EnableTrigger();
 
         GameObject.Find("Player").transform.position = new Vector3(0, 0.5f, 0);
         GameObject.Find("Progression").GetComponent<ProgressionLogic>().Reset();
         enemy.GetComponent<EnemyMovement>().Spawn();
+        enemy.GetComponentInChildren<EnemyTargetingLogic>().Reset();
+        direction.GetComponent<DirectionScript>().Activate();
     }
 
     private void Update()
@@ -68,10 +78,13 @@ public class GameStateManager : MonoBehaviour
 
     private void EndGame(bool won)
     {
+        player.Reset();
+        player.SetSignPlacement(false);
         terrain.SetActive(false);
 
+        npcs.SetActive(false);
         GameObject.Find("Player").transform.position = new Vector3(0, 0.5f, 0);
-        GameObject.Find("Progression").GetComponent<ProgressionLogic>().Reset();
+        GameObject.Find("Progression").GetComponent<ProgressionLogic>().Stop();
 
         enemy.SetActive(false);
 
@@ -87,5 +100,7 @@ public class GameStateManager : MonoBehaviour
 
         exitRune.Reset();
         retryRune.Reset();
+
+        direction.SetActive(false);
     }
 }

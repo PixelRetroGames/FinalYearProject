@@ -49,11 +49,14 @@ public class TerrainNavMeshObstacleSetter
             var scale = sq.transform.localScale;
             sq.transform.localScale = new Vector3(tree.widthScale * scale.x, tree.heightScale * scale.y, tree.widthScale * scale.z);
         }
+
+        GameObject.Find("SafeZone"). GetComponentsInChildren<SphereCollider>()[1].enabled = true;
     }
 
     public void Reset()
     {
         GameObject.DestroyImmediate(created);
         created = null;
+        GameObject.Find("SafeZone").GetComponentsInChildren<SphereCollider>()[1].enabled = false;
     }
 }
