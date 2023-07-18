@@ -12,7 +12,11 @@ public class TerrainObjectPlacer
 
     unsafe public void SetPlacement(TreeInstance* obj)
     {
-        obj->widthScale = Random.Range(minScaleHorizontal, maxScaleHorizontal); ;
+        if (obj->prototypeIndex == 5)
+        {
+            obj->prototypeIndex = 5;
+        }
+        obj->widthScale = Random.Range(minScaleHorizontal, maxScaleHorizontal);
         obj->heightScale = Random.Range(minScaleVertical, maxScaleHorizontal);
     }
 }

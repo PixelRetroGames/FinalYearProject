@@ -13,19 +13,21 @@ MonoBehaviour:
   m_Name: Tree Placer Terrain Mod Layer
   m_EditorClassIdentifier: 
   Tool: {fileID: 0}
-  createNavMeshAfterPlacing: 0
+  createNavMeshAfterPlacing: 1
   disabled: 0
   layers:
   - objects:
     - {fileID: 5535305502957207737, guid: 606d1d185f7ea5542bbabb8196eb3e38, type: 3}
     - {fileID: 4942515862347566044, guid: 9796b405d08286949b9943d275371988, type: 3}
     - {fileID: 3794477311923279640, guid: d9211ba8d59d43b4f9b31f5d832549a9, type: 3}
-    minDistance: 2
+    minDistance: 3
     splatMapLayer: 0
     indexes: 020000000300000004000000
     disabled: 0
-    noSpawnChance: 0.9
-    threshold: 0.2
+    noSpawnChance: 0.3
+    splatmapNoSpwanChance: 0.5
+    splatmapMultiplier: 0.5
+    threshold: 0
     objectPlacer:
       minScaleHorizontal: 0.5
       maxScaleHorizontal: 1
@@ -37,10 +39,12 @@ MonoBehaviour:
     splatMapLayer: 4
     indexes: 05000000
     disabled: 0
-    noSpawnChance: 0.944
+    noSpawnChance: 0.2
+    splatmapNoSpwanChance: 0.9
+    splatmapMultiplier: 0.5
     threshold: 0.202
     objectPlacer:
-      minScaleHorizontal: 0.2
-      maxScaleHorizontal: 0.5
-      minScaleVertical: 0.2
-      maxScaleVertical: 0.5
+      minScaleHorizontal: 0.1
+      maxScaleHorizontal: 0.7
+      minScaleVertical: 0.1
+      maxScaleVertical: 0.7

@@ -2,6 +2,7 @@ using Cinemachine;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Unity.AI.Navigation;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -9,6 +10,9 @@ using UnityEngine;
 [Serializable]
 public class ObjectPlacerTerrainModLayer : TerrainModLayer
 {
+    // position and distance
+    private static List<Tuple<Vector3, float>> illegalZones = new List<Tuple<Vector3, float>>();
+
     private static bool layersSet = false;
     private static List<TreePrototype> objects = new List<TreePrototype>();
 
@@ -28,6 +32,10 @@ public class ObjectPlacerTerrainModLayer : TerrainModLayer
         public bool disabled;
         [Range(0.0f, 1.0f)]
         public float noSpawnChance;
+        [Range(0.0f, 1.0f)]
+        public float splatmapNoSpwanChance = 0;
+        [Range(0.0f, 1.0f)]
+        public float splatmapMultiplier = 1f;
 
         [Range(0.0f, 1.0f)]
         public float threshold;
@@ -39,7 +47,12 @@ public class ObjectPlacerTerrainModLayer : TerrainModLayer
 
     public void OnValidate()
     {
-        Tool.OnValidate();
+        //Tool.OnValidate();
+    }
+
+    public void SetIllegalZones(List<Tuple<Vector3, float>> illegals)
+    {
+        illegalZones = illegals;
     }
 
     public void AddPrototypes()
@@ -104,11 +117,12 @@ public class ObjectPlacerTerrainModLayer : TerrainModLayer
             {
                 for (int y = 0; y < height; y++)
                 {
-                    float p = UnityEngine.Random.Range(0.0f, 1.0f) * (splatMap[x, y, splatMapLayer]);
+                    float noSpawn = UnityEngine.Random.Range(0.0f, 1.0f);
+                    float splatmapNoSpawnChance = UnityEngine.Random.Range(0.0f, 1.0f);
 
-                    if (/*p > splatMap[x, y, splatMapLayer] || */
-                        splatMap[x, y, splatMapLayer] < layers[layer].threshold ||
-                        p < layers[layer].noSpawnChance)
+                    if (splatMap[x, y, splatMapLayer] < layers[layer].threshold ||
+                        noSpawn < layers[layer].noSpawnChance ||
+                        splatmapNoSpawnChance < 1f - (splatMap[x, y, splatMapLayer] * layers[layer].splatmapMultiplier))
                     {
                         continue;
                     }
@@ -135,8 +149,10 @@ public class ObjectPlacerTerrainModLayer : TerrainModLayer
                         continue;
                     }
 
-                    Spawn(y, x, layer);
-                    placed[x, y] = true;
+                    if (Spawn(y, x, layer))
+                    {
+                        placed[x, y] = true;
+                    }
                 }
             }
 
@@ -168,8 +184,18 @@ public class ObjectPlacerTerrainModLayer : TerrainModLayer
         Tool._Terrain.Flush();
     }
 
-    private void Spawn(float x, float y, int layer)
+    private bool Spawn(float x, float y, int layer)
     {
+        var pos = GetWorldPosition(x, y);
+
+        foreach (var illegal in illegalZones)
+        {
+            if (Vector3.Distance(pos, illegal.Item1) < illegal.Item2)
+            {
+                return false;
+            }
+        }
+
         TreeInstance treeTemp = new TreeInstance();
 
         var width = Tool._TerrainData.alphamapWidth;
@@ -185,6 +211,7 @@ public class ObjectPlacerTerrainModLayer : TerrainModLayer
         //treeTemp.color = Color.white;
         //treeTemp.lightmapColor = Color.white;
         Tool._Terrain.AddTreeInstance(treeTemp);
+        return true;
     }
 
     public override void Apply()
@@ -193,7 +220,18 @@ public class ObjectPlacerTerrainModLayer : TerrainModLayer
         if (createNavMeshAfterPlacing)
         {
             NavMeshBaker baker = new NavMeshBaker();
-            baker.Bake();
+
+            var setter = new TerrainNavMeshObstacleSetter(Tool);
+            setter.Set();
+
+            var surfaces = Tool.GetComponentsInParent<NavMeshSurface>();
+
+            foreach (var surface in surfaces)
+            {
+                baker.Bake(surface);
+            }
+
+            setter.Reset();
         }
     }
 }
